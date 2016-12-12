@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Расписание ВСГТУ</title>
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons"rel="stylesheet">
+		<link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+		<link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+		<link rel="stylesheet" href="css/find.css">
+		<meta name="viewport" content="width=device-width">
+	</head>
+	<body>
+		<div class = "headerfix">
+			<div class = "app-bar">
+				<header class = "apphead">
+					<p class = "namegroup">Расписание<p>
+				</header>
+			</div>
+		</div>
+		<div class="container">
+			<div class="dropdown">
+				<span class="selLabel">Выберите направление</span>
+				<input type="hidden" name="cd-dropdown">
+				<ul class="dropdown-list">
+					<li data-value="1">
+						<span id = "spezialitet">Магистратура, колледж, ДОУ</span>
+					</li>
+					<li data-value="2">
+						<span id = "bakalavriat">Бакалавриат, специалитет</span>
+					</li>
+				</ul>
+			</div>
+			<div class="showbox">
+				<div class="loader">
+					<svg class="circular" viewBox="25 25 50 50">
+						<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+					</svg>
+				</div>
+			</div>
+			<form style="margin-top: 150px;">
+				<div class="group">      
+					<input type="text" id = "group" required>
+					<span class="highlight"></span>
+					<span class="bar"></span>
+					<label>Группа</label>
+				</div>
+				<div class = "codrops">
+				</div>
+			</form>
+			<section class="bt-container">
+				<input type="button" value="Открыть" class="bt two" id="setTable">
+			</section>
+		</div>
+		<!-- 	<script src="js/index.js"></script> -->
+		<script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
+		<script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'></script>
+		<script>
+$(document).ready(function() {
+	var nameTable;
+	$(".selLabel").click(function() {
+		 $('.dropdown').toggleClass('active');
+		 $('.dropdown').css("z-index", 9);
+		 $(".dropdown-list li").show();
+	});
+	$(".dropdown-list li").click(function() {
+		nameTable = $(this).children().attr('id')
+		$('.selLabel').text($(this).text());
+		$('.dropdown').removeClass('active');
+	});
+	$("#setTable").click(function() {
+		findTable();
+	});
+	var groups = new Object;
+	var listOfGroup = new Object;
+	function findTable() {
+		var name = document.getElementById('group').value;
+		console.log(name);
+		$(".showbox").show();
+		var tableGroup
+		if (nameTable === 'bakalavriat') {
+			tableGroup = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fportal.esstu.ru%2Fbakalavriat%2Fraspisan.htm%22and%20xpath%3D%22%2F%2Ftable%2Ftbody%2Ftr%22&format=json&diagnostics=true&callback=';
+		} else if (nameTable === 'spezialitet') {
+			tableGroup = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fportal.esstu.ru%2Fspezialitet%2Fraspisan.htm%22and%20xpath%3D%22%2F%2Ftable%2Ftbody%2Ftr%22&format=json&diagnostics=true&callback=';
+		} else {
+			$(".showbox").hide();
+			alert('Выберите направление');
+		};
+		$.getJSON(tableGroup, function(data, status, errorThrown) {
+			// if successful... *
+			if (status === 'success') {
+				// log object data in console
+				console.log(data);
+				if (data.query.results == null) {
+					$(".showbox").hide();
+					alert('Переполнено допустимое количество запросов');
+				};
+				var tableRow = data.query.results.tr;
+				tableRow.forEach(
+					function(itemRow, i, tableRow) {
+						tableCell = itemRow.td
+						var n = 1;
+						tableCell.forEach(
+							function(itemCell, j, tableCell) {
+								if ('a' in itemCell.p) {
+									if ('content' in itemCell.p.a.font) {
+										if (itemCell.p.a.font.content.indexOf(name) != -1) {
+											var li = listOfGroup[i] = new Object;
+											li['i'] = i;
+											li['j'] = j;
+											$(".codrops").append('<div class="listOfGroup" id = "' + i + '">' + itemCell.p.a.font.content + '</div>');
+											n = n++;
+										}
+									}
+								}
+							}
+						);
+					}
+				);
+				$(".showbox").hide();
+				if (!$(".listOfGroup")) {
+					alert('Группа не найдена :(');
+				};
+				$(".listOfGroup").click(
+					function() {
+						$(".showbox").show();
+						var id = this.id;
+						var idlist = listOfGroup[id];
+						var i = idlist['i']
+						var j = idlist['j']
+						var itemGroup = groups[data.query.results.tr[i].td[j].p.a.font.content] = new Object;
+						itemGroup.nameOfGroup = data.query.results.tr[i].td[j].p.a.font.content;
+						itemGroup.linkOfGroup = data.query.results.tr[i].td[j].p.a.href;
+						itemGroup.tableName = nameTable;
+						itemGroup.tabRow = i;
+						itemGroup.tabCell = j;
+						localStorage.setItem('groups', JSON.stringify(groups));
+						var urlOfGroup  = 'http://portal.esstu.ru/' + itemGroup.tableName + '/' + itemGroup.linkOfGroup;
+						console.log(groups);
+						console.log(urlOfGroup);
+						parseFeed(urlOfGroup);
+			 
+					}
+				);
+			} else if (status === 'error' || status === 'parsererror') {
+				// * log error message in console
+				console.log(errorThrown);
+				// * show error message
+				alert('Could not load RSS feed!');
+			}
+		});
+	};
+	var timeTable = new Object();
+	timeTable.firstWeek = new Object();
+	timeTable.secondWeek = new Object();
+	console.log(timeTable);
+	var nameWeekDay = [];
+	nameWeekDay[2] = 'monday';
+	nameWeekDay[3] = 'tuesday';
+	nameWeekDay[4] = 'wednesday';
+	nameWeekDay[5] = 'thursday';
+	nameWeekDay[6] = 'friday';
+	nameWeekDay[7] = 'saturday';
+	nameWeekDay[8] = 'monday';
+	nameWeekDay[9] = 'tuesday';
+	nameWeekDay[10] = 'wednesday';
+	nameWeekDay[11] = 'thursday';
+	nameWeekDay[12] = 'friday';
+	nameWeekDay[13] = 'saturday';
+	var nameClassDay = [];
+	nameClassDay[1] = 'first';
+	nameClassDay[2] = 'second';
+	nameClassDay[3] = 'third';
+	nameClassDay[4] = 'fourth';
+	nameClassDay[5] = 'fifth';
+	nameClassDay[6] = 'sixth';
+	function parseFeed(url) {
+		var query = 'https://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//table/tbody/tr"') + '&format=json';
+		// send request
+		$.getJSON(query, function(data, status, errorThrown) {
+			// if successful... *
+			if (status === 'success') {
+				// log object data in console
+				console.log(data);
+				var itemDay = data.query.results.tr;
+				if (data.query.results == null) {
+					alert('Переполнено допустимое количество запросов');
+				};
+				itemDay.forEach(
+					function(item, i, itemDay) {
+						if (i >= 2 & i <= 7) {
+							var itemWeekDay = timeTable.firstWeek[nameWeekDay[i]] = new Object;
+							for (var j = 1; j <= 6; j++) {
+								var itemTimetableDay = item.td[j];
+								var itemClassDay = itemWeekDay[nameClassDay[j]] = new Object;
+								if (itemTimetableDay.p.font.content.indexOf('лек.') != -1) {
+									itemClassDay.clas = 'ЛК';
+									itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.length);
+									var temp = itemTimetableDay.p.font.content.split(' ');
+									var resulttemp = [];
+									temp.forEach(
+										function(item, i, temp) {
+											if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+												resulttemp.push(temp[i]);
+											}
+										}
+									);
+									console.log(resulttemp);
+									itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1];
+									itemClassDay.name = itemTimetableDay.p.font.content.substring(4, itemTimetableDay.p.font.content.indexOf(itemClassDay.teacher));
+								} else if (itemTimetableDay.p.font.content.indexOf('лаб.') != -1) {
+									itemClassDay.clas = 'ЛБ';
+									var temp = itemTimetableDay.p.font.content.split(' ');
+									var resulttemp = [];
+									temp.forEach(
+										function (item, i ,temp) {
+											if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+												resulttemp.push(temp[i]);
+											}	 
+										}
+									);
+									console.log(resulttemp);
+									if (resulttemp.length > 2) {
+										itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1] + ' ' + resulttemp[2] + ' ' + resulttemp[3];
+										console.log(itemClassDay.teacher);
+										itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.indexOf(resulttemp[2])) + ' ' + itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.',itemTimetableDay.p.font.content.indexOf(resulttemp[2])), itemTimetableDay.p.font.content.length) ;
+										itemClassDay.name = itemTimetableDay.p.font.content.substring(4, itemTimetableDay.p.font.content.indexOf(resulttemp[0]));
+										console.log(itemTimetableDay.p.font.content.indexOf(resulttemp[0]));
+									} else {
+										itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.length);
+										itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1];
+										itemClassDay.name = itemTimetableDay.p.font.content.substring(4, itemTimetableDay.p.font.content.indexOf(itemClassDay.teacher));
+									};
+								} else if (itemTimetableDay.p.font.content.indexOf('пр.') != -1) {
+									itemClassDay.clas = 'ПР';
+									itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.length);
+									var temp = itemTimetableDay.p.font.content.split(' ');
+									var resulttemp = [];
+									temp.forEach(
+										function(item, i, temp) {
+											if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+												resulttemp.push(temp[i]);
+											}
+										}
+									);
+									console.log(resulttemp);
+									itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1];
+									itemClassDay.name = itemTimetableDay.p.font.content.substring(3, itemTimetableDay.p.font.content.indexOf(itemClassDay.teacher));
+								} else if (itemTimetableDay.p.font.content.indexOf('ФИЗКУЛЬТУРА') != -1) {
+									itemClassDay.clas = 'ФР';
+									itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.length);
+									var temp = itemTimetableDay.p.font.content.split(' ');
+									var resulttemp = [];
+									temp.forEach(
+										function (item, i ,temp) {
+											if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+												resulttemp.push(temp[i]);
+											} 
+										}
+									);
+									console.log(resulttemp);
+									itemClassDay.name = resulttemp[0];
+								};
+							}
+						} else if (i >= 8 & i <= 13) {
+							var itemWeekDay = timeTable.secondWeek[nameWeekDay[i]] = new Object;
+							for (var j = 1; j <= 6; j++) {
+								var itemTimetableDay = item.td[j];
+								var itemClassDay = itemWeekDay[nameClassDay[j]] = new Object;
+								if (itemTimetableDay.p.font.content.indexOf('лек.') != -1) {
+									itemClassDay.clas = 'ЛК';
+									itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.length);
+									var temp = itemTimetableDay.p.font.content.split(' ');
+									var resulttemp = [];
+									temp.forEach(
+										function(item, i, temp) {
+											if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+												resulttemp.push(temp[i]);
+											}
+										}
+									);
+									console.log(resulttemp);
+									itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1];
+									itemClassDay.name = itemTimetableDay.p.font.content.substring(5, itemTimetableDay.p.font.content.indexOf(itemClassDay.teacher));
+								} else if (itemTimetableDay.p.font.content.indexOf('лаб.') != -1) {
+									itemClassDay.clas = 'ЛБ';
+									var temp = itemTimetableDay.p.font.content.split(' ');
+				   
+									var resulttemp = [];
+									temp.forEach(
+										function (item, i ,temp) {
+											if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+												resulttemp.push(temp[i]);
+											} 
+										}
+									);
+									console.log(resulttemp);
+									if (resulttemp.length > 2) {
+										itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1] + ' ' + resulttemp[2] + ' ' + resulttemp[3];
+										console.log(itemClassDay.teacher);
+										itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.indexOf(resulttemp[2])) + ' ' + itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.',itemTimetableDay.p.font.content.indexOf(resulttemp[2])), itemTimetableDay.p.font.content.length) ;
+										itemClassDay.name = itemTimetableDay.p.font.content.substring(5, itemTimetableDay.p.font.content.indexOf(resulttemp[0]));
+										console.log(itemTimetableDay.p.font.content.indexOf(resulttemp[0]));
+									} else {
+										itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.length);
+										itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1];
+										itemClassDay.name = itemTimetableDay.p.font.content.substring(4, itemTimetableDay.p.font.content.indexOf(itemClassDay.teacher));
+									};
+								} else if (itemTimetableDay.p.font.content.indexOf('пр.') != -1) {
+									itemClassDay.clas = 'ПР';
+									itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.length);
+									var temp = itemTimetableDay.p.font.content.split(' ');
+									var resulttemp = [];
+									temp.forEach(
+										function(item, i, temp) {
+											if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+												resulttemp.push(temp[i]);
+											}
+										}
+									);
+									console.log(resulttemp);
+									itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1];
+									itemClassDay.name = itemTimetableDay.p.font.content.substring(4, itemTimetableDay.p.font.content.indexOf(itemClassDay.teacher));
+								} else if (itemTimetableDay.p.font.content.indexOf('ФИЗКУЛЬТУРА') != -1){
+									itemClassDay.clas = 'ФР';
+									itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.indexOf('а.')+10);
+									var temp = itemTimetableDay.p.font.content.split(' ');
+									var resulttemp = [];
+									temp.forEach(
+										function (item, i ,temp) {
+											if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+												resulttemp.push(temp[i]);
+											} 
+										}
+									);
+									console.log(resulttemp);
+									itemClassDay.name = resulttemp[0];
+								};
+							}
+						}
+					}
+				);
+				localStorage.setItem('timeTable', JSON.stringify(timeTable));
+				console.log(timeTable);
+				window.location = "timetable.html";
+			} else if (status === 'error' || status === 'parsererror') {
+				// * log error message in console
+				console.log(errorThrown);
+				// * show error message
+				alert('Не удалось получить данные');
+			}
+		});
+	}
+});
+		</script>
+	</body>
+</html>

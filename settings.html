@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Настройки</title>
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons"rel="stylesheet">
+		<link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+		<link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+        <link rel="stylesheet" href="css/settings.css">
+		<meta name="viewport" content="width=device-width">
+	</head>
+	<body>
+		<nav id="menu" class = "menu">
+			<nav id="mm-menu" class="mm-menu">
+				<div class="mm-menu__header">
+				</div>
+				<table class="mm-menu__items">
+					<tbody class="mm-menu__item">
+						<tr class = "row-menu">
+							<td>
+								<span class="mm-menu__link-text"><i class="material-icons">account_circle</i></span>
+							</td>
+							<td class = "cell-menu">
+								<span class="mm-menu__link-text"><p class="md md-home">Мое расписание</p></span>
+							</td>
+						</tr>
+						<tr class = "row-menu">
+							<td>
+								<span class="mm-menu__link-text"><i class="material-icons">settings</i></span>
+							</td>
+							<td class = "cell-menu">
+								<span class="mm-menu__link-text"><p class="md md-person">Настройки</p></span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</nav>
+		</nav>
+		<main id="panel">
+			<div id="mask"></div>
+			<div class = "headerfix">
+				<div class = "app-bar">
+					<header class = "apphead">
+						<div class="toggle-button">≡</div>
+						<p class = "namegroup">Настройки<p>
+					</header>
+				</div>
+			</div>
+			<div class="container">
+				<div class="showbox">
+					<div class="loader">
+						<svg class="circular" viewBox="25 25 50 50">
+							<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+						</svg>
+					</div>
+				</div>
+				<h2 style="padding-left: 10%;margin: 50px auto;margin-top: 150px;">Группа</h2>
+				<div class = "listOfGroup">
+				</div>
+				<section class="bt-container">
+					<input type="button" value="Обновить расписание" style="background-color:#FF9800" class="bt two" id="reloud">
+				</section>
+				<section class="bt-container">
+					<input type="button" value="Изменить группу" class="bt two" id="change">
+				</section>
+			</div>
+		</main>
+		<script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
+		<script src="js/slideout.js"></script>
+		<script src="js/slideout.min.js"></script>
+		<script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'></script>
+		<script>
+$(document).ready(function() {
+	var retrievedObject = localStorage.getItem('groups');
+	var nameGroup = JSON.parse(retrievedObject);
+	//console.log(nameGroup);
+	for (var key in nameGroup) {
+		$(".mm-menu__header").append('<p class = "namegroup name-menu">' + key + '</p>');
+		$(".listOfGroup").append('<p style = "color:black; font-size:1.2em;padding-top: 0px;" class = "namegroup name-menu">' + key + '</p>');
+	}
+	document.querySelector('#reloud').addEventListener('click', function() {
+		$(".showbox").show();
+		//for (var item in nameGroup) {
+			//var urlOfGroup = 'http://portal.esstu.ru/' + nameGroup[item].tableName + '/' + nameGroup[item].linkOfGroup;
+			//console.log(urlOfGroup);
+			//parseFeed(urlOfGroup);
+		//};
+		var obj = nameGroup;
+		reFresh(obj);
+		function reFresh(obj) {
+			for (var item in nameGroup) {
+				var b = obj[item].tabCell + 1;
+				console.log(b);
+				var c = obj[item].tabRow + 1;
+				console.log(c);
+				var tableGroup = 'https://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="http://portal.esstu.ru/' + obj[item].tableName + '/raspisan.htm" and xpath="//table/tbody/tr[position() = ' + c + ']/td[position() = ' + b + ']"') + '&format=json';
+				console.log(tableGroup)
+				$.getJSON(tableGroup, function(data, status, errorThrown) {
+				// if successful... *
+					if (status === 'success') {
+						// log object data in console
+						console.log(data);
+						if (data.query.results.td.p.a.font.content.indexOf(obj.nameOfGroup) != -1) {
+							var itemGroup = groups[data.query.results.tr[c].td[b].p.a.font.content];
+							itemGroup.linkOfGroup = data.query.results.tr[c].td[b].p.a.href;        
+							localStorage.setItem('groups', JSON.stringify(obj));
+							var urlOfGroup = 'http://portal.esstu.ru/' + nameGroup[item].tableName + '/' + nameGroup[item].linkOfGroup;
+							console.log(urlOfGroup);
+							parseFeed(urlOfGroup);
+						} else {
+							var urlOfGroup = 'http://portal.esstu.ru/' + nameGroup[item].tableName + '/' + nameGroup[item].linkOfGroup;
+							console.log(urlOfGroup);
+							parseFeed(urlOfGroup);
+						}
+					} else if (status === 'error' || status === 'parsererror') {
+						// * log error message in console
+						console.log(errorThrown);
+						// * show error message
+						alert('Could not load RSS feed!');
+					}
+				});
+			};
+        }
+        var timeTable = new Object();
+        timeTable.firstWeek = new Object();
+        timeTable.secondWeek = new Object();
+        console.log(timeTable);
+        var nameWeekDay = [];
+        nameWeekDay[2] = 'monday';
+        nameWeekDay[3] = 'tuesday';
+        nameWeekDay[4] = 'wednesday';
+        nameWeekDay[5] = 'thursday';
+        nameWeekDay[6] = 'friday';
+        nameWeekDay[7] = 'saturday';
+        nameWeekDay[8] = 'monday';
+        nameWeekDay[9] = 'tuesday';
+        nameWeekDay[10] = 'wednesday';
+        nameWeekDay[11] = 'thursday';
+        nameWeekDay[12] = 'friday';
+        nameWeekDay[13] = 'saturday';
+        var nameClassDay = [];
+        nameClassDay[1] = 'first';
+        nameClassDay[2] = 'second';
+        nameClassDay[3] = 'third';
+        nameClassDay[4] = 'fourth';
+        nameClassDay[5] = 'fifth';
+        nameClassDay[6] = 'sixth';
+        function parseFeed(url) {
+			var query = 'https://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//table/tbody/tr"') + '&format=json';
+			// send request
+			$.getJSON(query, function(data, status, errorThrown) {
+				// if successful... *
+				if (status === 'success') {
+					// log object data in console
+					console.log(data);
+					var itemDay = data.query.results.tr;
+					itemDay.forEach(
+						function(item, i, itemDay) {
+							if (i >= 2 & i <= 7) {
+								var itemWeekDay = timeTable.firstWeek[nameWeekDay[i]] = new Object;
+								for (var j = 1; j <= 6; j++) {
+									var itemTimetableDay = item.td[j];
+									var itemClassDay = itemWeekDay[nameClassDay[j]] = new Object;
+									if (itemTimetableDay.p.font.content.indexOf('лек.') != -1) {
+										itemClassDay.clas = 'ЛК';
+										itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.length);
+										var temp = itemTimetableDay.p.font.content.split(' ');
+										var resulttemp = [];
+										temp.forEach(
+											function(item, i, temp) {
+												if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+													resulttemp.push(temp[i]);
+												}
+											}
+										);
+										console.log(resulttemp);
+										itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1];
+										itemClassDay.name = itemTimetableDay.p.font.content.substring(4, itemTimetableDay.p.font.content.indexOf(itemClassDay.teacher));
+									} else if (itemTimetableDay.p.font.content.indexOf('лаб.') != -1) {
+										itemClassDay.clas = 'ЛБ';
+										var temp = itemTimetableDay.p.font.content.split(' ');
+										var resulttemp = [];
+										temp.forEach(
+											function (item, i ,temp) {
+												if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+													resulttemp.push(temp[i]);
+												}	 
+											}
+										);
+										console.log(resulttemp);
+										if (resulttemp.length > 2) {
+											itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1] + ' ' + resulttemp[2] + ' ' + resulttemp[3];
+											console.log(itemClassDay.teacher);
+											itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.indexOf(resulttemp[2])) + ' ' + itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.',itemTimetableDay.p.font.content.indexOf(resulttemp[2])), itemTimetableDay.p.font.content.length) ;
+											itemClassDay.name = itemTimetableDay.p.font.content.substring(4, itemTimetableDay.p.font.content.indexOf(resulttemp[0]));
+											console.log(itemTimetableDay.p.font.content.indexOf(resulttemp[0]));
+										} else {
+											itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.length);
+											itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1];
+											itemClassDay.name = itemTimetableDay.p.font.content.substring(4, itemTimetableDay.p.font.content.indexOf(itemClassDay.teacher));
+										};
+									} else if (itemTimetableDay.p.font.content.indexOf('пр.') != -1) {
+										itemClassDay.clas = 'ПР';
+										itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.length);
+										var temp = itemTimetableDay.p.font.content.split(' ');
+										var resulttemp = [];
+										temp.forEach(
+											function(item, i, temp) {
+												if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+													resulttemp.push(temp[i]);
+												}
+											}
+										);
+										console.log(resulttemp);
+										itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1];
+										itemClassDay.name = itemTimetableDay.p.font.content.substring(3, itemTimetableDay.p.font.content.indexOf(itemClassDay.teacher));
+									} else if (itemTimetableDay.p.font.content.indexOf('ФИЗКУЛЬТУРА') != -1) {
+										itemClassDay.clas = 'ФР';
+										itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.length);
+										var temp = itemTimetableDay.p.font.content.split(' ');
+										var resulttemp = [];
+										temp.forEach(
+											function (item, i ,temp) {
+												if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+													resulttemp.push(temp[i]);
+												} 
+											}
+										);
+										console.log(resulttemp);
+										itemClassDay.name = resulttemp[0];
+									};
+								}
+							} else if (i >= 8 & i <= 13) {
+								var itemWeekDay = timeTable.secondWeek[nameWeekDay[i]] = new Object;
+								for (var j = 1; j <= 6; j++) {
+									var itemTimetableDay = item.td[j];
+									var itemClassDay = itemWeekDay[nameClassDay[j]] = new Object;
+									if (itemTimetableDay.p.font.content.indexOf('лек.') != -1) {
+										itemClassDay.clas = 'ЛК';
+										itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.length);
+										var temp = itemTimetableDay.p.font.content.split(' ');
+										var resulttemp = [];
+										temp.forEach(
+											function(item, i, temp) {
+												if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+													resulttemp.push(temp[i]);
+												}
+											}
+										);
+										console.log(resulttemp);
+										itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1];
+										itemClassDay.name = itemTimetableDay.p.font.content.substring(5, itemTimetableDay.p.font.content.indexOf(itemClassDay.teacher));
+									} else if (itemTimetableDay.p.font.content.indexOf('лаб.') != -1) {
+										itemClassDay.clas = 'ЛБ';
+										var temp = itemTimetableDay.p.font.content.split(' ');
+					   
+										var resulttemp = [];
+										temp.forEach(
+											function (item, i ,temp) {
+												if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+													resulttemp.push(temp[i]);
+												} 
+											}
+										);
+										console.log(resulttemp);
+										if (resulttemp.length > 2) {
+											itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1] + ' ' + resulttemp[2] + ' ' + resulttemp[3];
+											console.log(itemClassDay.teacher);
+											itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.indexOf(resulttemp[2])) + ' ' + itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.',itemTimetableDay.p.font.content.indexOf(resulttemp[2])), itemTimetableDay.p.font.content.length) ;
+											itemClassDay.name = itemTimetableDay.p.font.content.substring(5, itemTimetableDay.p.font.content.indexOf(resulttemp[0]));
+											console.log(itemTimetableDay.p.font.content.indexOf(resulttemp[0]));
+										} else {
+											itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.length);
+											itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1];
+											itemClassDay.name = itemTimetableDay.p.font.content.substring(4, itemTimetableDay.p.font.content.indexOf(itemClassDay.teacher));
+										};
+									} else if (itemTimetableDay.p.font.content.indexOf('пр.') != -1) {
+										itemClassDay.clas = 'ПР';
+										itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.length);
+										var temp = itemTimetableDay.p.font.content.split(' ');
+										var resulttemp = [];
+										temp.forEach(
+											function(item, i, temp) {
+												if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+													resulttemp.push(temp[i]);
+												}
+											}
+										);
+										console.log(resulttemp);
+										itemClassDay.teacher = resulttemp[0] + ' ' + resulttemp[1];
+										itemClassDay.name = itemTimetableDay.p.font.content.substring(4, itemTimetableDay.p.font.content.indexOf(itemClassDay.teacher));
+									} else if (itemTimetableDay.p.font.content.indexOf('ФИЗКУЛЬТУРА') != -1){
+										itemClassDay.clas = 'ФР';
+										itemClassDay.classroom = itemTimetableDay.p.font.content.substring(itemTimetableDay.p.font.content.indexOf('а.'), itemTimetableDay.p.font.content.indexOf('а.')+10);
+										var temp = itemTimetableDay.p.font.content.split(' ');
+										var resulttemp = [];
+										temp.forEach(
+											function (item, i ,temp) {
+												if (temp[i] === temp[i].toUpperCase() & isNaN(temp[i])) {
+													resulttemp.push(temp[i]);
+												} 
+											}
+										);
+										console.log(resulttemp);
+										itemClassDay.name = resulttemp[0];
+									};
+								}
+							}
+						}
+					);
+					localStorage.setItem('timeTable', JSON.stringify(timeTable));
+					console.log(timeTable);
+					window.location = "timetable.html";
+				} else if (status === 'error' || status === 'parsererror') {
+					// * log error message in console
+					console.log(errorThrown);
+					// * show error message
+					alert('Could not load RSS feed!');
+				}
+			});
+        }
+	});
+});
+		</script>
+		<script>
+			var slideout = new Slideout({
+				'panel': document.getElementById('panel'),
+				'menu': document.getElementById('menu'),
+				'padding': 256,
+				'tolerance': 70
+			});
+			document.querySelector('.toggle-button').addEventListener('click', function() {
+				slideout.toggle();
+			});
+			document.querySelector('.menu').addEventListener('click', function(eve) {
+				if (eve.target.nodeName === 'A') { slideout.close(); }
+			});
+			document.querySelector('.md-home').addEventListener('click', function() {
+				window.location = "timetable.html";
+			});
+			document.querySelector('.md-person').addEventListener('click', function() {
+				slideout.close();
+			});
+			document.querySelector('#change').addEventListener('click', function() {
+				window.location = "find.html";
+			});
+			document.querySelector('#mask').addEventListener('click', function() {
+				slideout.close();
+			});
+			slideout.on('translatestart', function() {
+				console.log('Start');
+			});
+
+			slideout.on('translate', function(translated) {
+				console.log('Translate: ' + translated); // 120 in px
+			});
+
+			slideout.on('translateend', function() {
+				console.log('End');
+			});
+		</script>
+	</body>
+</html>
