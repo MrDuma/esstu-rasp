@@ -2,124 +2,75 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>Mobile Tabs</title>
+		<title>Расписание ВСГУТУ</title>
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons"rel="stylesheet">
 		<link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
 		<link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
 		<link rel="stylesheet" href="css/timetable.css">
+		<link rel="stylesheet" href="css/menu.css">
 		<meta name="viewport" content="width=device-width">
 	</head>
 	<body>
-		<nav id="menu" class = "menu">
-			<nav id="mm-menu" class="mm-menu">
-				<div class="mm-menu__header">
-				</div>
-				<table class="mm-menu__items">
-					<tbody class="mm-menu__item">
-						<tr class = "row-menu">
-							<td>
-								<span class="mm-menu__link-text"><i class="material-icons">account_circle</i></span>
-							</td>
-							<td class = "cell-menu">
-								<span class="mm-menu__link-text"><p class="md md-home">Мое расписание</p></span>
-							</td>
-						</tr>
-						<tr class = "row-menu">
-							<td>
-								<span class="mm-menu__link-text"><i class="material-icons">settings</i></span>
-							</td>
-							<td class = "cell-menu">
-								<span class="mm-menu__link-text"><p class="md md-person">Настройки</p></span>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</nav>
-		</nav>	  
+		<div class="menu">
+			<ul>
+				<li class="menu-settings">Настройки</li>
+				<li>Сменить группу</li>
+			</ul>
+		</div>
 		<main id="panel">
+			<div class="swipe-area"></div>
 			<div id="mask"></div>
-			<div class = "app-bar">
-				<header class = "apphead">
-					<button class="toggle-button">≡</button>
+			<div class="app-bar">
+				<header class="apphead">
+					<a href="#" id="sidebar-toggle">
+						<span class="bar"></span>
+						<span class="bar"></span>
+						<span class="bar"></span>
+					</a>
 				</header>
 			</div>
 			<div class="container">
 				<div class="tabbable">
 					<ul class="nav nav-tabs">
 						<li class="active">
-							<a href="#tab1" data-toggle="tab">
+							<a href="#tab1" data-toggle="tab" aria-expanded="true">
 								1 неделя
-								<div id = "one">
+								<div id="one">
 								</div>
 							</a>
 						</li>
 						<li>
 							<a href="#tab2" data-toggle="tab">
 								2 неделя
-								<div id = "two">
+								<div id="two">
 								</div>
 							</a>
 						</li>
 					</ul>
 					<div class="tab-content">
 						<div class="tab-pane fade in active" id="tab1">
-							<iframe id = "first" src ="swipe.html" width="100%" height="100%" frameborder="0"></iframe>
+							<iframe id="first" src ="firstweek.html" width="100%" height="100%" frameborder="0"></iframe>
 						</div>
 						<div class="tab-pane fade" id="tab2">
-							<iframe id = "second" src ="swipe2.html" width="100%" height="100%" frameborder="0" ></iframe>
+							<iframe id="second" src ="secondweek.html" width="100%" height="100%" frameborder="0" ></iframe>
 						</div>
 					</div>
 				</div>
 			</div>
 			<script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
 			<script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'></script>
-			<script src="js/slideout.min.js"></script>
+			<script src="js/menu.js"></script>
 			<script src="js/weekNum.js"></script>
-			<script src="js/slideout.js"></script>
 			<script>
 				$(document).ready(function() {
 					var retrievedObject = localStorage.getItem('groups');
 					nameGroup = JSON.parse(retrievedObject);
 					console.log(nameGroup);
 					for (var key in nameGroup) {
-						$("header").append('<p class = "namegroup">' + key + '</p>');
-						$(".mm-menu__header").append('<p class = "namegroup name-menu">' + key + '</p>');
+						$("header").append('<p class="namegroup">' + key + '</p>');
 					}
 				});
 			</script>
-			<script>
-			var slideout = new Slideout({
-				'panel': document.getElementById('panel'),
-				'menu': document.getElementById('menu'),
-				'padding': 256,
-				'tolerance': 70
-			});
-			document.querySelector('.toggle-button').addEventListener('click', function() {
-				slideout.toggle();
-			});
-			document.querySelector('.menu').addEventListener('click', function(eve) {
-				if (eve.target.nodeName === 'A') { slideout.close(); }
-			});
-			document.querySelector('.md-home').addEventListener('click', function() {
-				slideout.close();
-			});
-			document.querySelector('.md-person').addEventListener('click', function() {
-				window.location = "settings.html";
-			});
-			document.querySelector('#mask').addEventListener('click', function() {
-				slideout.close();
-			});
-			slideout.on('translatestart', function() {
-				console.log('Start');
-			});
-
-			slideout.on('translate', function(translated) {
-				console.log('Translate: ' + translated); // 120 in px
-			});
-
-			slideout.on('translateend', function() {
-				console.log('End');
-			});	
-		</script>  
+		</main>
 	</body>
 </html>
