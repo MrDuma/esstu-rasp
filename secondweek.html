@@ -83,8 +83,9 @@
 				timeKey["third"] = "12:00";
 				timeKey["fourth"] = "13:45";
 				timeKey["fifth"] = "15:25";
-				timeKey["sixth"] = "17:05";	  
-				var retrievedObject = localStorage.getItem('timeTable');
+				timeKey["sixth"] = "17:05";
+				var active = localStorage.getItem('activeGrope');
+				var retrievedObject = localStorage.getItem('timeTable'+active);
 				schedule = JSON.parse(retrievedObject);
 				var week =  schedule.secondWeek;
 				for (var key in week) {

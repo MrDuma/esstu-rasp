@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Расписание ВСГУТУ</title>
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons"rel="stylesheet">
+		<link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+		<link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+		<link rel="stylesheet" href="css/switch.css">
+		<link rel="stylesheet" href="css/menu.css">
+		<meta name="viewport" content="width=device-width">
+	</head>
+	<body>
+		<div class="menu">
+			<ul>
+				<li class="menu-home">К расписанию</li>
+			</ul>
+		</div>
+		<div class="headerfix">
+			<div class="app-bar">
+				<header class="apphead">
+					<a href="#" id="sidebar-toggle">
+						<span class="bar"></span>
+						<span class="bar"></span>
+						<span class="bar"></span>
+					</a>
+					<p class="namegroup">Сменить группу</p><p>
+				</p></header>
+			</div>
+		</div>
+		<div class="container">
+			<div class="codrops">
+			</div>
+			<section class="bt-container">
+				<input type="button" value="Добавить группу" class="bt two" id="addGroup">
+			</section>
+		</div>
+		<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<script src="js/menu.js"></script>
+		<script>
+			$(document).ready(function() {
+				var active = localStorage.getItem('activeGrope');
+				var retrievedObject = localStorage.getItem('groups');
+				nameGroups = JSON.parse(retrievedObject);
+				for (var key in nameGroups) {
+					if(active == key) {
+						$(".codrops").append('<div class="listOfGroup active"><div class="el">' + key + '<div class="act">Активно</div></div></div>');
+					} else {
+						$(".codrops").append('<div class="listOfGroup"><div class="el">' + key + '</div><div class="delete"><span class="bar"></span><span class="bar"></span></div></div>');
+					}
+				}
+				$("#addGroup").click(function() {
+					window.location = "find.html";
+				});
+				$(".listOfGroup .el").click(function() {
+					localStorage.setItem('activeGrope', $(this).text());
+					window.location = "timetable.html";
+				});
+				$(".listOfGroup .delete").click(function() {
+					localStorage.removeItem('timeTable'+$(this).parent().text());
+					var retrievedObject = localStorage.getItem('groups');
+					nameGroups = JSON.parse(retrievedObject);
+					delete nameGroups[$(this).parent().text()];
+					localStorage.setItem('groups', JSON.stringify(nameGroups));
+					window.location = "switch.html";
+				});
+			});
+		</script>
+	</body>
+</html>

@@ -70,28 +70,31 @@ $(document).ready(function() {
 					alert('Группа не найдена :(');
 				};
 				$(".listOfGroup").click(function() {
-						$(".showbox").show();
-						var id = this.id;
-						var idlist = listOfGroup[id];
-						var i = idlist['i']
-						var j = idlist['j']
-						var itemGroup = groups[data.query.results.tr[i].td[j].p.a.font.content] = new Object;
-						itemGroup.nameOfGroup = data.query.results.tr[i].td[j].p.a.font.content;
-						itemGroup.linkOfGroup = data.query.results.tr[i].td[j].p.a.href;
-						itemGroup.tableName = nameTable;
-						itemGroup.tabRow = i;
-						itemGroup.tabCell = j;
-						localStorage.setItem('groups', JSON.stringify(groups));
-						var urlOfGroup  = 'http://portal.esstu.ru/' + itemGroup.tableName + '/' + itemGroup.linkOfGroup;						
-						parseFeed(urlOfGroup);
+					$(".showbox").show();
+					var id = this.id;
+					var idlist = listOfGroup[id];
+					var i = idlist['i']
+					var j = idlist['j']
+					var retrievedObject = localStorage.getItem('groups');
+					if(retrievedObject != null) {
+						groups = JSON.parse(retrievedObject);
 					}
-				);
+					var itemGroup = groups[data.query.results.tr[i].td[j].p.a.font.content] = new Object;
+					itemGroup.nameOfGroup = data.query.results.tr[i].td[j].p.a.font.content;
+					itemGroup.linkOfGroup = data.query.results.tr[i].td[j].p.a.href;
+					itemGroup.tableName = nameTable;
+					itemGroup.tabRow = i;
+					itemGroup.tabCell = j;
+					localStorage.setItem('groups', JSON.stringify(groups));
+					var urlOfGroup  = 'http://portal.esstu.ru/' + itemGroup.tableName + '/' + itemGroup.linkOfGroup;						
+					parseFeed(urlOfGroup, itemGroup.nameOfGroup);
+				});
 			} else if (status === 'error' || status === 'parsererror') {
 				alert('Ошибка! Попробуйте позже!');
 			}
 		});
 	};
-	function parseFeed(url) {
+	function parseFeed(url, nameOfGroup) {
 		var query = 'https://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//table/tbody/tr"') + '&format=json';
 		$.getJSON(query, function(data, status, errorThrown) {
 			if (status === 'success') {
@@ -149,7 +152,8 @@ $(document).ready(function() {
 						}
 					}
 				);
-				localStorage.setItem('timeTable', JSON.stringify(timeTable));
+				localStorage.setItem('timeTable'+nameOfGroup, JSON.stringify(timeTable));
+				localStorage.setItem('activeGrope', nameOfGroup);
 				window.location = "timetable.html";
 			} else if (status === 'error' || status === 'parsererror') {
 				alert('Не удалось получить данные');

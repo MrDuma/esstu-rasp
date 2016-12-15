@@ -20,4 +20,10 @@ $(document).ready(function() {
 	$(".menu-settings").click(function() {
 		window.location = "settings.html";
 	});
+	$(".menu-switch").click(function() {
+		window.location = "switch.html";
+	});
+	$(".menu-home").click(function() {
+		window.location = "timetable.html";
+	});
 });
