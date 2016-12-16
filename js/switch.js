@@ -1,7 +1,12 @@
 $(document).ready(function() {
 	var active = localStorage.getItem('activeGroup');
 	var retrievedObject = localStorage.getItem('groups');
-	nameGroups = JSON.parse(retrievedObject);
+	var nameGroups = JSON.parse(retrievedObject);
+	var timeTable = new Object();
+	timeTable.firstWeek = new Object();
+	timeTable.secondWeek = new Object();
+	var nameWeekDay = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+	var nameClassDay = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth'];
 	for (var key in nameGroups) {
 		if(active == key) {
 			$(".codrops").append('<div class="listOfGroup active"><div class="el">' + key + '<div class="act">Активно</div></div><div class="icon-spinner11" style="margin-top:-39px !important"></div></div>');
@@ -26,6 +31,37 @@ $(document).ready(function() {
 		localStorage.setItem('groups', JSON.stringify(nameGroups));
 		window.location = "switch.html";
 	});
+
+	$(".listOfGroup .icon-spinner11").click(function() {
+		$(".showbox").show();
+		reFresh(nameGroups);
+	});
+	function reFresh(obj) {
+			for (var item in nameGroups) {
+				var b = obj[item].tabCell + 1;
+				var c = obj[item].tabRow + 1;
+				var tableGroup = 'https://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="http://portal.esstu.ru/' + obj[item].tableName + '/raspisan.htm" and xpath="//table/tbody/tr[position() = ' + c + ']/td[position() = ' + b + ']"') + '&format=json';
+				$.getJSON(tableGroup, function(data, status, errorThrown) {
+					if (status === 'success') {
+						if (data.query.results.td.p.a.font.content.indexOf(obj.nameOfGroup) != -1) {
+							var itemGroup = groups[data.query.results.tr[c].td[b].p.a.font.content];
+							itemGroup.linkOfGroup = data.query.results.tr[c].td[b].p.a.href;        
+							localStorage.setItem('groups', JSON.stringify(obj));
+							var urlOfGroup = 'http://portal.esstu.ru/' + nameGroup[item].tableName + '/' + nameGroup[item].linkOfGroup;
+							console.log(urlOfGroup);
+							parseFeed(urlOfGroup, obj.nameOfGroup);
+						} else {
+							var urlOfGroup = 'http://portal.esstu.ru/' + nameGroup[item].tableName + '/' + nameGroup[item].linkOfGroup;
+							console.log(urlOfGroup);
+							parseFeed(urlOfGroup, obj.nameOfGroup);
+						}
+					} else if (status === 'error' || status === 'parsererror') {
+						alert('Ошибка! Попробуйте позже!');
+					}
+				});
+			};
+			$(".showbox").hide();
+        }
 	function parseFeed(url, nameOfGroup) {
 		var query = 'https://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + url + '" and xpath="//table/tbody/tr"') + '&format=json';
 		$.getJSON(query, function(data, status, errorThrown) {
@@ -85,7 +121,6 @@ $(document).ready(function() {
 					}
 				);
 				localStorage.setItem('timeTable'+nameOfGroup, JSON.stringify(timeTable));
-				localStorage.setItem('activeGroup', nameOfGroup);
 				window.location = "timetable.html";
 			} else if (status === 'error' || status === 'parsererror') {
 				alert('Не удалось получить данные');
