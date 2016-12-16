@@ -211,7 +211,6 @@ p.footer {
 	top: 0;
 	left: 100%;
 	width: 100%;
-	padding: 20px 20px 0 20px;
 	transition: 1s all;
 	transform: translate3d(0, 0, 0);
 }
