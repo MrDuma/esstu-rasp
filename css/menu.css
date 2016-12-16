@@ -2,12 +2,12 @@
 	position: fixed;
 	background: #ffffff;
 	max-height: 100%;
-	right: 0;
-	top: 56px;
+	right: 4px;
+	top: 47px;
 	min-width: 188px;
 	box-sizing: border-box;
-	border-radius: 2px;
-	box-shadow: 0 0 10px rgba(0,0,0,0.5);
+	border-radius: 1px;
+	box-shadow: 0 0 15px rgba(0,0,0,0.5);
 	z-index: 1500;
 	display: none;
 }
@@ -15,7 +15,7 @@
 	display: block;
 }
 .menu ul {
-	padding: 7px 10px 10px 10px;
+	padding: 7px 10px 7px 10px;
 	margin: 0px;
 }
 .menu ul li {
@@ -31,15 +31,15 @@
     position: absolute;
     float: right;
     right: 0;
-    margin-top: 4px;
+    margin-top: 9px;
     z-index: 11;
     margin-right: 25px;
 }
 #sidebar-toggle .bar{
 	display: block;
-	width: 5px;
-	margin-bottom: 5px;
-	height: 5px;
+	width: 4px;
+	margin-bottom: 4px;
+	height: 4px;
 	background-color: #fff;
 	border-radius: 13px;
 }

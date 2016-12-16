@@ -29,44 +29,43 @@ p.footer {
 	text-align: center;
 }
 .nav-tabs {
-  overflow: hidden;
-  white-space:nowrap;
-  border-bottom:none;
-  background-color: #fff;
-  position: fixed;
+	overflow: hidden;
+	white-space:nowrap;
+	border-bottom:none;
+	background-color: #fff;
+	position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000;
 }
 .nav-tabs>li {
-  display:inline-block;
-  float:none;
-  padding: 0;
-  margin: 0 -3px;
-  width: 17.6%;
-  text-align:center;
-  height:48px;
+	display:inline-block;
+	float:none;
+	padding: 0;
+	margin: 0 -3px;
+	width: 17.6%;
+	text-align:center;
+	height:48px;
 }
 .nav-tabs>li>a {
-  border:none;
-  color: black;
-  padding-bottom: 20px;
-  font-size:14px;
-  height:48px;
-  text-transform: uppercase;
+	border:none;
+	color: black;
+	padding-bottom: 20px;
+	font-size:14px;
+	height:48px;
+	text-transform: uppercase;
 }
 .nav-tabs>li>a:focus, .nav-tabs>li>a:hover {
-  background-color:transparent;
-  border-bottom:solid 2px #fff;
+	background-color:transparent;
+	border-bottom:solid 2px #fff;
 }
 .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
-  border:none;
-  color: black;
-  background-color:transparent;
-  border-bottom:solid 4px #FFEB3B;
-  height:48px;
+	border:none;
+	color: black;
+	background-color:transparent;
+	border-bottom:solid 4px #FFEB3B;
+	height:48px;
 }
-
 .time {
     background-color: #2196f3;
     color: white;
@@ -76,7 +75,6 @@ p.footer {
     width: 55px;
     height: 55px;
 }
-
 .typeofclass {
 	float: left;
     margin-left: 10px;
@@ -87,31 +85,26 @@ p.footer {
     border-radius: 20px;
     text-align: center;
 }
-
 .nameofclass {
-	    margin-left: 70px;
-		    min-height: 50px;
+	margin-left: 70px;
+	min-height: 50px;
 }
 
 .roomofclass {
-	    float: right;
+	float: right;
     margin-right: 20px;
 	padding: 5px;
 }
-
 .teacherofclass {
 	    margin-left: 70px;
 }
-
 .tab-content {
 	height: 95vh;
 	margin-top: 70px;
 }
-
 .listofclass {
     width: 100%;
 }
-
 .timeblock {
 	float: right;
 	margin: 7px 10px;

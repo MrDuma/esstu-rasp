@@ -20,13 +20,13 @@
 			<div class="swipe-area"></div>
 			<div id="mask"></div>
 			<div class="app-bar">
-				<header class="apphead">
+				<div class="apphead">
 					<a href="#" id="sidebar-toggle">
 						<span class="bar"></span>
 						<span class="bar"></span>
 						<span class="bar"></span>
 					</a>
-				</header>
+				</div>
 			</div>
 			<div class="container">
 				<div class="tabbable">
@@ -63,7 +63,7 @@
 			<script>
 				$(document).ready(function() {
 					var active = localStorage.getItem('activeGroup');				
-					$("header").append('<p class="namegroup">' + active + '</p>');
+					$(".apphead").append('<p class="namegroup">' + active + '</p>');
 				});
 			</script>
 		</main>
