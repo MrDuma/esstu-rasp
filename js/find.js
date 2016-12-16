@@ -115,7 +115,12 @@ $(document).ready(function() {
 							for (var j = 1; j <= 6; j++) {
 								var itemPara = item.td[j].p.font.content;
 								var itemClassDay = itemWeekDay[nameClassDay[j-1]] = new Object;
-								var classroom = itemPara.substring(itemPara.indexOf('а.'), itemPara.length);
+								var classroom = new Object;
+								var numsymroom = itemPara.indexOf('а.');
+								classroom[1] = itemPara.substring(numsymroom, itemPara.indexOf(' ',numsymroom));
+								if (itemPara.indexOf('а.',classroom[1]) != undefined) {
+									classroom[2] = itemPara.substring(itemPara.indexOf('а.'), itemPara.length());
+								}
 								var temp = itemPara.split(' ');
 								var resulttemp = []
 								temp.forEach(
