@@ -87,6 +87,7 @@
 				var active = localStorage.getItem('activeGroup');
 				var retrievedObject = localStorage.getItem('timeTable'+active);
 				schedule = JSON.parse(retrievedObject);
+				console.log(schedule);
 				var week =  schedule.firstWeek;
 				for (var key in week) {
 					var weekDay = week[key];

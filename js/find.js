@@ -118,8 +118,9 @@ $(document).ready(function() {
 								var classroom = new Object;
 								var numsymroom = itemPara.indexOf('а.');
 								classroom[1] = itemPara.substring(numsymroom, itemPara.indexOf(' ',numsymroom));
-								if (itemPara.indexOf('а.',classroom[1]) != undefined) {
-									classroom[2] = itemPara.substring(itemPara.indexOf('а.'), itemPara.length());
+								if (itemPara.indexOf('а.', numsymroom + 1) != -1) {
+									if (classroom[1] != itemPara.substring(itemPara.lastIndexOf('а.'), itemPara.length))
+									classroom[2] = itemPara.substring(itemPara.lastIndexOf('а.'), itemPara.length);
 								}
 								var temp = itemPara.split(' ');
 								var resulttemp = []
@@ -130,28 +131,54 @@ $(document).ready(function() {
 										}
 									}
 								);
-								var teacher = resulttemp[0] + ' ';
-								for (var k = 1; k < resulttemp.length; k++) {
-									teacher = teacher + resulttemp[k];
-									if(k+1 != resulttemp.length) {
-										teacher = teacher + ' ';
-									}
-								}
+								var indexdot1 
+								for (var index = 0; index < resulttemp.length; ++index) {
+									if (resulttemp[index].indexOf('.') != -1) {
+											indexdot1 = index;
+											break;
+										}
+								};
+								var teacher = new Object;
+								teacher[1] = resulttemp[indexdot1 - 1] + ' ' + resulttemp[indexdot1];
+								var indexdot2 = 0;
+								for (var index = 0; index < resulttemp.length; ++index) {
+									if (index > indexdot1) {
+											if (resulttemp[index].indexOf('.') != -1) {
+												indexdot2 = index;
+											}
+										}
+								};
+								if (indexdot2 != 0) {teacher[2] = resulttemp[indexdot2-1] + ' ' + resulttemp[indexdot2];};
 								while(itemPara.substring(0, 1) == ' ') {
 									itemPara = itemPara.substring(1, itemPara.length);
 								}
 								if (itemPara.substring(0, 4) ==  'лек.') {
-									itemPara = itemPara.substring(4, itemPara.indexOf('а.'));
-									addClass(itemClassDay, "ЛК", "lecture", classroom, teacher, itemPara.substring(0, itemPara.indexOf(teacher)));
+									itemPara = itemPara.substring(4, itemPara.length);
+									var name = new Object;
+									name[1] = itemPara.substring(0, itemPara.indexOf(teacher[1]));
+									if (teacher[2] != undefined) {
+										name[2] = itemPara.substring(itemPara.indexOf(classroom[1]) + classroom[1].length, itemPara.indexOf(teacher[2]));
+									}
+									addClass(itemClassDay, "ЛК", "lecture", classroom, teacher, name);
 								} else if (itemPara.substring(0, 4) ==  'лаб.') {
-									itemPara = itemPara.substring(4, itemPara.indexOf('а.'));
-									addClass(itemClassDay, 'ЛБ', "laboratory", classroom, teacher, itemPara.substring(0, itemPara.indexOf(teacher)));
+									itemPara = itemPara.substring(4, itemPara.length);
+									var name = new Object;
+									name[1] = itemPara.substring(0, itemPara.indexOf(teacher[1]));
+									if (teacher[2] != undefined) {
+										name[2] = itemPara.substring(itemPara.indexOf(classroom[1]) + classroom[1].length, itemPara.indexOf(teacher[2]));
+									}
+									addClass(itemClassDay, 'ЛБ', "laboratory", classroom, teacher, name);
 								} else if (itemPara.substring(0, 3) ==  'пр.') {
-									itemPara = itemPara.substring(3, itemPara.indexOf('а.'));
-									addClass(itemClassDay, 'ПР', "practice", classroom, teacher, itemPara.substring(0, itemPara.indexOf(teacher)));
+									itemPara = itemPara.substring(3, itemPara.length);
+									var name = new Object;
+									name[1] = itemPara.substring(0, itemPara.indexOf(teacher[1]));
+									if (teacher[2] != undefined) {
+										name[2] = itemPara.substring(itemPara.indexOf(classroom[1]) + classroom[1].length, itemPara.indexOf(teacher[2]));
+									}
+									addClass(itemClassDay, 'ПР', "practice", classroom, teacher, name);
 								} else if (itemPara.indexOf('ФИЗКУЛЬТУРА') != -1) {
 									itemPara = itemPara.substring(0, itemPara.indexOf('а.'));
-									addClass(itemClassDay, 'ФК', "physical-edu", classroom, teacher, 'ФИЗКУЛЬТУРА');
+									addClass(itemClassDay, 'ФК', "physical-edu", classroom, 'ФКС', 'ФИЗКУЛЬТУРА');
 								};
 							}
 						}
@@ -159,7 +186,8 @@ $(document).ready(function() {
 				);
 				localStorage.setItem('timeTable'+nameOfGroup, JSON.stringify(timeTable));
 				localStorage.setItem('activeGroup', nameOfGroup);
-				window.location = "timetable.html";
+				console.log(timeTable);
+				//window.location = "timetable.html";
 			} else if (status === 'error' || status === 'parsererror') {
 				alert('Не удалось получить данные');
 			}
