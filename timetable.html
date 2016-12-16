@@ -13,7 +13,6 @@
 	<body>
 		<div class="menu">
 			<ul>
-				<li class="menu-settings">Настройки</li>
 				<li class="menu-switch">Сменить группу</li>
 			</ul>
 		</div>
@@ -63,7 +62,7 @@
 			<script src="js/weekNum.js"></script>
 			<script>
 				$(document).ready(function() {
-					var active = localStorage.getItem('activeGrope');				
+					var active = localStorage.getItem('activeGroup');				
 					$("header").append('<p class="namegroup">' + active + '</p>');
 				});
 			</script>

@@ -29,6 +29,13 @@
 			</div>
 		</div>
 		<div class="container">
+			<div class="showbox">
+				<div class="loader">
+					<svg class="circular" viewBox="25 25 50 50">
+						<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+					</svg>
+				</div>
+			</div>
 			<div class="codrops">
 			</div>
 			<section class="bt-container">
@@ -38,34 +45,6 @@
 		<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 		<script src="js/menu.js"></script>
-		<script>
-			$(document).ready(function() {
-				var active = localStorage.getItem('activeGrope');
-				var retrievedObject = localStorage.getItem('groups');
-				nameGroups = JSON.parse(retrievedObject);
-				for (var key in nameGroups) {
-					if(active == key) {
-						$(".codrops").append('<div class="listOfGroup active"><div class="el">' + key + '<div class="act">Активно</div></div></div>');
-					} else {
-						$(".codrops").append('<div class="listOfGroup"><div class="el">' + key + '</div><div class="delete"><span class="bar"></span><span class="bar"></span></div></div>');
-					}
-				}
-				$("#addGroup").click(function() {
-					window.location = "find.html";
-				});
-				$(".listOfGroup .el").click(function() {
-					localStorage.setItem('activeGrope', $(this).text());
-					window.location = "timetable.html";
-				});
-				$(".listOfGroup .delete").click(function() {
-					localStorage.removeItem('timeTable'+$(this).parent().text());
-					var retrievedObject = localStorage.getItem('groups');
-					nameGroups = JSON.parse(retrievedObject);
-					delete nameGroups[$(this).parent().text()];
-					localStorage.setItem('groups', JSON.stringify(nameGroups));
-					window.location = "switch.html";
-				});
-			});
-		</script>
+		<script src="js/switch.js"></script>
 	</body>
 </html>

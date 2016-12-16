@@ -153,7 +153,7 @@ $(document).ready(function() {
 					}
 				);
 				localStorage.setItem('timeTable'+nameOfGroup, JSON.stringify(timeTable));
-				localStorage.setItem('activeGrope', nameOfGroup);
+				localStorage.setItem('activeGroup', nameOfGroup);
 				window.location = "timetable.html";
 			} else if (status === 'error' || status === 'parsererror') {
 				alert('Не удалось получить данные');

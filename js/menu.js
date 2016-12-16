@@ -17,9 +17,6 @@ $(document).ready(function() {
 			$("#mask").removeClass("active");
 		}
 	});
-	$(".menu-settings").click(function() {
-		window.location = "settings.html";
-	});
 	$(".menu-switch").click(function() {
 		window.location = "switch.html";
 	});
