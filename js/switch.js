@@ -18,7 +18,7 @@ $(document).ready(function() {
 		window.location = "find.html";
 	});
 	$(".listOfGroup .el").click(function() {
-		if(!$(this).parent().hasClass(active)) {
+		if(!$(this).parent().hasClass('active')) {
 			localStorage.setItem('activeGroup', $(this).text());
 		}
 		window.location = "timetable.html";
