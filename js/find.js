@@ -165,7 +165,8 @@ $(document).ready(function() {
 									var name = new Object;
 									name[1] = itemPara.substring(0, itemPara.indexOf(teacher[1]));
 									if (teacher[2] != undefined) {
-										name[2] = itemPara.substring(itemPara.indexOf(classroom[1]) + classroom[1].length, itemPara.indexOf(teacher[2]));
+										if (! /\S/.test( itemPara.substring(itemPara.indexOf(classroom[1]) + classroom[1].length, itemPara.indexOf(teacher[2])))){ //проверка на пробелы
+										name[2] = itemPara.substring(itemPara.indexOf(classroom[1]) + classroom[1].length, itemPara.indexOf(teacher[2]));}
 									}
 									addClass(itemClassDay, 'ЛБ', "laboratory", classroom, teacher, name);
 								} else if (itemPara.substring(0, 3) ==  'пр.') {
@@ -173,7 +174,8 @@ $(document).ready(function() {
 									var name = new Object;
 									name[1] = itemPara.substring(0, itemPara.indexOf(teacher[1]));
 									if (teacher[2] != undefined) {
-										name[2] = itemPara.substring(itemPara.indexOf(classroom[1]) + classroom[1].length, itemPara.indexOf(teacher[2]));
+										if (! /\S/.test( itemPara.substring(itemPara.indexOf(classroom[1]) + classroom[1].length, itemPara.indexOf(teacher[2])))){ //проверка на пробелы
+										name[2] = itemPara.substring(itemPara.indexOf(classroom[1]) + classroom[1].length, itemPara.indexOf(teacher[2]));}
 									}
 									addClass(itemClassDay, 'ПР', "practice", classroom, teacher, name);
 								} else if (itemPara.indexOf('ФИЗКУЛЬТУРА') != -1) {
