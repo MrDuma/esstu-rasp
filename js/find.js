@@ -187,7 +187,7 @@ $(document).ready(function() {
 				localStorage.setItem('timeTable'+nameOfGroup, JSON.stringify(timeTable));
 				localStorage.setItem('activeGroup', nameOfGroup);
 				console.log(timeTable);
-				//window.location = "timetable.html";
+				window.location = "timetable.html";
 			} else if (status === 'error' || status === 'parsererror') {
 				alert('Не удалось получить данные');
 			}
